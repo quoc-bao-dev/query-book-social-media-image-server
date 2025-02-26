@@ -4,7 +4,9 @@
     "main": "index.js",
     "license": "MIT",
     "scripts": {
-        "dev": "bun run --watch --env-file=.env  src/index.ts"
+        "dev": "bun run --watch --env-file=.env  src/index.ts",
+        "build": "tsc --noCheck",
+        "start": "node  --env-file=.env dist/index.js"
     },
     "dependencies": {
         "cors": "^2.8.5",
