@@ -7,6 +7,9 @@ import sharp from 'sharp'; // Thêm thư viện sharp
 import { deleteUnusedFiles } from './cron';
 import authMiddleware from './middleware';
 import cors from 'cors';
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 const port = process.env.PORT || 3008;
 const app = express();
@@ -18,13 +21,17 @@ const uploadsDir = path.join(__dirname, '../public/uploads');
 if (!fs.existsSync(uploadsDir)) {
     fs.mkdirSync(uploadsDir, { recursive: true });
 }
+const corsOrigins = process.env.CORS_ALLOWED_ORIGINS!.split(',');
+console.log(corsOrigins);
 
 app.use(
     cors({
-        origin: ['*', 'http://localhost:3000'],
-        credentials: true,
+        origin: corsOrigins, // Thay bằng domain frontend cụ thể khi triển khai production
+        methods: ['GET', 'POST', 'OPTIONS'], // Đảm bảo hỗ trợ OPTIONS cho preflight
+        allowedHeaders: ['Content-Type', 'Authorization'], // Các header frontend có thể gửi
     })
 );
+
 app.use(express.static('public/uploads'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
