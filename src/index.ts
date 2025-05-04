@@ -82,14 +82,17 @@ app.post(
         }
 
         try {
-            const compressedPath = await compressImage(
-                req.file.buffer,
-                req.file.originalname
+            const time = Date.now(); // Thời gian hiện tại
+            const filePath = path.join(
+                uploadsDir,
+                `${time}-${req.file.originalname}`
             );
+            fs.writeFileSync(filePath, req.file.buffer); // Lưu file trực tiếp
+
             return res.status(200).json({
-                message: 'File uploaded & compressed successfully',
-                fileName: path.basename(compressedPath),
-                filePath: `/public/uploads/${path.basename(compressedPath)}`,
+                message: 'File uploaded successfully',
+                fileName: path.basename(filePath),
+                filePath: `/public/uploads/${path.basename(filePath)}`,
             });
         } catch (err) {
             console.error(err);
@@ -109,23 +112,24 @@ app.post(
         }
 
         try {
-            const uploadedFiles = await Promise.all(
-                (req.files as Express.Multer.File[]).map(async (file) => {
-                    const compressedPath = await compressImage(
-                        file.buffer,
-                        file.originalname
+            const uploadedFiles = (req.files as Express.Multer.File[]).map(
+                (file) => {
+                    const time = Date.now(); // Thời gian hiện tại
+                    const filePath = path.join(
+                        uploadsDir,
+                        `${time}-${file.originalname}`
                     );
+                    fs.writeFileSync(filePath, file.buffer); // Lưu file trực tiếp
+
                     return {
-                        filename: path.basename(compressedPath),
-                        path: `/public/uploads/${path.basename(
-                            compressedPath
-                        )}`,
+                        filename: path.basename(filePath),
+                        path: `/public/uploads/${path.basename(filePath)}`,
                     };
-                })
+                }
             );
 
             return res.status(200).json({
-                message: 'Files uploaded & compressed successfully',
+                message: 'Files uploaded successfully',
                 files: uploadedFiles,
             });
         } catch (err) {
